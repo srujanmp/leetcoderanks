@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LeetCode Stats</title>
+    <style>
+        #rankings {
+          border-collapse: collapse;
+          width: 100%;
+        }
+        #rankings td, #rankings th {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: left;
+        }
+        #rankings th {
+          background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>LeetCode Stats</h1>
+    <input type="text" id="url" placeholder="Enter LeetCode profile URL">
+    <button onclick="getStats()">Get Stats</button>
+    <button id="refreshBtn" style="display: none;" onclick="refreshStats()">Refresh Rankings</button>
+
+    <div id="stats"></div>
+    <h2>Rankings:</h2>
+    <table id="rankings">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Ranking</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const adminUsername = "srujanmpadmashali"; // Hardcoded admin username
+
+        function extractUsername(url) {
+            const match = url.match(/^https:\/\/leetcode\.com\/u\/([^\/]+)/);
+            return match ? match[1] : null;
+        }
+
+        async function getStats() {
+            const url = document.getElementById('url').value;
+            const username = extractUsername(url);
+
+            if (!username) {
+                alert("Invalid LeetCode URL. Please enter a valid URL.");
+                return;
+            }
+
+            const response = await fetch('/getStats', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                document.getElementById('stats').innerHTML = `
+                    <p>Total Solved: ${data.totalSolved}</p>
+                    <p>Ranking: ${data.ranking}</p>
+                `;
+                updateRankings();
+            } else {
+                document.getElementById('stats').innerHTML = `<p>${data.message}</p>`;
+            }
+        }
+
+        async function refreshStats() {
+            const response = await fetch(`/refreshStats?admin=${adminUsername}`);
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                updateRankings();
+            } else {
+                alert(data.message);
+            }
+        }
+
+        async function updateRankings() {
+            const response = await fetch('/getRankings');
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                const tableBody = document.getElementById('rankings').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = '';
+
+                data.users.forEach(user => {
+                    const row = tableBody.insertRow();
+                    const usernameCell = row.insertCell();
+                    const rankingCell = row.insertCell();
+                    usernameCell.textContent = user.username;
+                    rankingCell.textContent = user.ranking;
+                });
+            }
+        }
+
+        function checkAdmin() {
+            const currentUsername = prompt("Enter your username:");
+            if (currentUsername === adminUsername) {
+                document.getElementById('refreshBtn').style.display = "block";
+            }
+        }
+
+        checkAdmin();
+        updateRankings();
+    </script>
+</body>
+</html>

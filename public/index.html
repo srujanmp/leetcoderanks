@@ -2,25 +2,149 @@
 <html>
 <head>
     <title>LeetCode Stats</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f0f8; /* Light lavender background */
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #673ab7; /* Deep purple heading */
+            margin-bottom: 20px;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #d0bfff; /* Light purple border */
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #f3e5f5; /* Light pink background */
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #9c27b0; /* Purple button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        #stats {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #7e57c2; /* Lighter purple for stats */
+        }
+
         #rankings {
-          border-collapse: collapse;
-          width: 100%;
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed;
+            margin-bottom: 20px;
         }
-        #rankings td, #rankings th {
-          border: 1px solid #ddd;
-          padding: 8px;
-          text-align: left;
+
+        #rankings th, #rankings td {
+            border: 1px solid #e1bee7; /* Light lavender border */
+            padding: 12px;
+            text-align: left;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+            font-size: 14px;
         }
+
         #rankings th {
-          background-color: #f2f2f2;
+            background-color: #ab47bc; /* Deep purple header */
+            color: white;
         }
+
+        #rankings tr:nth-child(even) {
+            background-color: #f5f0f5; /*very light lavender for even rows */
+        }
+
+        #rankings td:nth-child(1) {
+            width: 60%;
+        }
+
+        #rankings td:nth-child(2), #rankings td:nth-child(3) {
+            width: 20%;
+        }
+
+        @media (max-width: 600px) {
+            .input-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            input[type="text"] {
+                margin-bottom: 10px;
+            }
+
+            button {
+                margin-left: 0;
+            }
+
+            #rankings td:nth-child(1) {
+                width: 50%;
+            }
+
+            #rankings td:nth-child(2), #rankings td:nth-child(3) {
+                width: 25%;
+            }
+        }
+
+        footer {
+            text-align: center; /* Center the text */
+            margin-top: 20px; /* Add some space above the footer */
+            font-size: 14px; /* Slightly smaller font size */
+            color: #757575; /* Gray color */
+        }
+
+        .heart {
+            color: #e91e63; /* Pink heart color */
+            animation: pulse 1.5s infinite ease-in-out; /* Add animation */
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+
     </style>
 </head>
 <body>
+    <footer>
+        Made with <span class="heart">❤</span> by Srujan M Padmashali
+    </footer>
+    
     <h1>LeetCode Stats</h1>
-    <input type="text" id="url" placeholder="Enter LeetCode profile URL">
-    <button onclick="getStats()">Get Stats</button>
+    <div class="input-container">
+        <input type="text" id="url" placeholder="Enter LeetCode profile URL">
+        <button onclick="getStats()">Get Stats</button>
+    </div>
     <button id="refreshBtn" style="display: none;" onclick="refreshStats()">Refresh Rankings</button>
 
     <div id="stats"></div>
@@ -30,10 +154,15 @@
             <tr>
                 <th>Username</th>
                 <th>Ranking</th>
+                <th>Solved</th>
             </tr>
         </thead>
         <tbody></tbody>
     </table>
+
+    
+
+
 
     <script>
         const adminUsername = "srujanmpadmashali"; // Hardcoded admin username
@@ -93,8 +222,10 @@
                     const row = tableBody.insertRow();
                     const usernameCell = row.insertCell();
                     const rankingCell = row.insertCell();
+                    const solved = row.insertCell();
                     usernameCell.textContent = user.username;
                     rankingCell.textContent = user.ranking;
+                    solved.textContent=user.stats.totalSolved;
                 });
             }
         }
